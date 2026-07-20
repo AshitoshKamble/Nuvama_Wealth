@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Shirtify - Product Catalog</title>
+<style>
+  :root {
+    --bg: #f8fafc;
+    --card: #ffffff;
+    --text: #0f172a;
+    --muted: #64748b;
+    --primary: #2563eb;
+    --primary-dark: #1d4ed8;
+    --accent: #f59e0b;
+    --border: #e2e8f0;
+    --success: #16a34a;
+    --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
+    --shadow-hover: 0 10px 25px -5px rgba(0,0,0,0.12), 0 8px 10px -6px rgba(0,0,0,0.05);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  .header {
+    background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
+    color: white;
+    padding: 3rem 1.5rem 2.5rem;
+    text-align: center;
+  }
+  .header h1 { font-size: 2.25rem; font-weight: 800; letter-spacing: -0.02em; }
+  .header p { margin-top: 0.5rem; color: #bfdbfe; font-size: 1rem; }
+  .header .badge {
+    display: inline-block; margin-top: 1rem; padding: 0.35rem 0.9rem;
+    background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.25);
+    border-radius: 999px; font-size: 0.8rem; font-weight: 600;
+  }
+  .container { max-width: 1200px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+  .toolbar {
+    display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: center;
+    margin-bottom: 2rem;
+  }
+  .chip {
+    padding: 0.5rem 1.1rem; background: white; border: 1px solid var(--border);
+    border-radius: 999px; font-size: 0.85rem; font-weight: 600; color: var(--muted);
+    cursor: pointer; transition: all 0.2s ease;
+  }
+  .chip:hover { border-color: var(--primary); color: var(--primary); }
+  .chip.active { background: var(--primary); color: white; border-color: var(--primary); }
+  .grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 1.5rem;
+  }
+  .card {
+    background: var(--card); border-radius: 14px; overflow: hidden;
+    box-shadow: var(--shadow); transition: transform 0.25s ease, box-shadow 0.25s ease;
+    display: flex; flex-direction: column; border: 1px solid var(--border);
+  }
+  .card:hover { transform: translateY(-4px); box-shadow: var(--shadow-hover); }
+  .card .img-wrap {
+    position: relative; aspect-ratio: 4/5; overflow: hidden; background: #f1f5f9;
+  }
+  .card img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.4s ease; }
+  .card:hover img { transform: scale(1.05); }
+  .featured-tag {
+    position: absolute; top: 0.75rem; left: 0.75rem; background: var(--accent);
+    color: #78350f; font-size: 0.7rem; font-weight: 700; padding: 0.25rem 0.6rem;
+    border-radius: 6px; text-transform: uppercase; letter-spacing: 0.03em;
+  }
+  .discount-tag {
+    position: absolute; top: 0.75rem; right: 0.75rem; background: var(--success);
+    color: white; font-size: 0.72rem; font-weight: 700; padding: 0.25rem 0.55rem;
+    border-radius: 6px;
+  }
+  .card .body { padding: 1rem 1.1rem 1.25rem; display: flex; flex-direction: column; flex: 1; }
+  .card .cat { font-size: 0.7rem; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: 0.05em; }
+  .card h3 { font-size: 1.05rem; font-weight: 700; margin-top: 0.25rem; }
+  .card .desc { font-size: 0.82rem; color: var(--muted); margin-top: 0.35rem; line-height: 1.5;
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .card .meta { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.65rem; }
+  .card .meta span {
+    font-size: 0.7rem; background: #f1f5f9; color: var(--muted); padding: 0.2rem 0.55rem;
+    border-radius: 5px; font-weight: 600;
+  }
+  .card .price-row { display: flex; align-items: baseline; gap: 0.5rem; margin-top: 0.85rem; }
+  .card .price { font-size: 1.2rem; font-weight: 800; color: var(--text); }
+  .card .mrp { font-size: 0.85rem; color: var(--muted); text-decoration: line-through; }
+  .card .btn {
+    margin-top: 1rem; padding: 0.65rem; background: var(--primary); color: white;
+    border: none; border-radius: 9px; font-size: 0.88rem; font-weight: 700; cursor: pointer;
+    transition: background 0.2s ease; text-align: center; text-decoration: none; display: block;
+  }
+  .card .btn:hover { background: var(--primary-dark); }
+  .empty { text-align: center; padding: 4rem 1rem; color: var(--muted); }
+  .footer { text-align: center; padding: 2rem 1rem; color: var(--muted); font-size: 0.82rem; border-top: 1px solid var(--border); background: white; }
+  .footer a { color: var(--primary); text-decoration: none; font-weight: 600; }
+  @media (max-width: 600px) {
+    .header h1 { font-size: 1.6rem; }
+    .grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 1rem; }
+    .card h3 { font-size: 0.95rem; }
+    .card .price { font-size: 1.05rem; }
+  }
+</style>
+</head>
+<body>
+  <header class="header">
+    <h1>Shirtify</h1>
+    <p>Premium shirts for every occasion</p>
+    <span class="badge">Live Product Catalog</span>
+  </header>
+  <main class="container">
+    <div class="toolbar" id="filters"></div>
+    <div class="grid" id="grid"></div>
+    <div class="empty" id="empty" style="display:none;">No products in this category.</div>
+  </main>
+  <footer class="footer">
+    Shirtify Catalog &middot; Prices in INR &middot; <a href="https://github.com/AshitoshKamble/Nuvama_Wealth">View on GitHub</a>
+  </footer>
+
+<script>
+const products = [
+  {"name":"Navy Slim Fit","description":"Modern slim fit shirt in deep navy. Ideal for both office and smart casual settings.","price":1199,"original_price":1499,"image_url":"https://images.unsplash.com/photo-1607345363174-cc233e2e0a2d?w=600","category":"formal","size":"L","color":"Navy","fabric":"Cotton Blend","is_featured":true},
+  {"name":"Light Blue Linen","description":"Breathable linen shirt in light blue. Perfect for summer with natural texture and comfort.","price":1499,"original_price":1899,"image_url":"https://images.unsplash.com/photo-1596755094514-f87e34085b6c?w=600","category":"casual","size":"L","color":"Light Blue","fabric":"Linen","is_featured":true},
+  {"name":"Casual Blue Check","description":"Relaxed fit check shirt in shades of blue. Comfortable and stylish for everyday wear.","price":999,"original_price":1299,"image_url":"https://images.unsplash.com/photo-1600554161862-5bc5bfc4c5a1?w=600","category":"casual","size":"M","color":"Blue","fabric":"Cotton","is_featured":true},
+  {"name":"Classic White Oxford","description":"A timeless white oxford shirt perfect for formal occasions. Crisp cotton fabric with a subtle texture.","price":1299,"original_price":1599,"image_url":"https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?w=600","category":"formal","size":"M","color":"White","fabric":"Cotton","is_featured":true},
+  {"name":"Olive Green Utility","description":"Modern utility shirt in olive green. Features multiple pockets for a trendy look.","price":1199,"original_price":1599,"image_url":"https://images.unsplash.com/photo-1594938298603-c8148c4dae35?w=600","category":"casual","size":"L","color":"Olive","fabric":"Cotton Twill","is_featured":false},
+  {"name":"Pink Pastel Oxford","description":"Soft pink oxford shirt for a fresh, modern look. Perfect for spring and summer occasions.","price":1099,"original_price":1399,"image_url":"https://images.unsplash.com/photo-1598032895397-b9472447bf15?w=600","category":"formal","size":"S","color":"Pink","fabric":"Cotton","is_featured":false},
+  {"name":"Indigo Denim Style","description":"Stylish indigo colored shirt with denim-like appearance. A wardrobe essential for casual wear.","price":1299,"original_price":1699,"image_url":"https://images.unsplash.com/photo-1608234808654-2a8875faa7fd?w=600","category":"casual","size":"M","color":"Indigo","fabric":"Denim Cotton","is_featured":false},
+  {"name":"Black Premium Formal","description":"Premium black formal shirt with a subtle sheen. Perfect for important meetings and events.","price":1599,"original_price":1999,"image_url":"https://images.unsplash.com/photo-1598033120184-589dac5d6c0a?w=600","category":"formal","size":"M","color":"Black","fabric":"Premium Cotton","is_featured":false},
+  {"name":"Burgundy Wine Shirt","description":"Rich burgundy wine colored shirt. Adds a touch of sophistication to any outfit.","price":1299,"original_price":1699,"image_url":"https://images.unsplash.com/photo-1616938317757-d6b5e8f5dc4b?w=600","category":"formal","size":"M","color":"Burgundy","fabric":"Cotton Silk","is_featured":false},
+  {"name":"Grey Heather Casual","description":"Comfortable heather grey t-shirt. Premium cotton with a soft feel and relaxed fit.","price":699,"original_price":899,"image_url":"https://images.unsplash.com/photo-1583743814966-8936d5f5f2f1?w=600","category":"casual","size":"M","color":"Grey","fabric":"100% Cotton","is_featured":false}
+];
+
+const grid = document.getElementById('grid');
+const empty = document.getElementById('empty');
+const filters = document.getElementById('filters');
+let active = 'all';
+
+function discount(p) {
+  if (!p.original_price || p.original_price <= p.price) return 0;
+  return Math.round((1 - p.price / p.original_price) * 100);
+}
+
+function render() {
+  const list = active === 'all' ? products : products.filter(p => p.category === active);
+  if (!list.length) { empty.style.display = 'block'; grid.innerHTML = ''; return; }
+  empty.style.display = 'none';
+  grid.innerHTML = list.map(p => {
+    const d = discount(p);
+    return `
+    <article class="card">
+      <div class="img-wrap">
+        <img src="${p.image_url}" alt="${p.name}" loading="lazy" onerror="this.src='https://placehold.co/600x750/e2e8f0/64748b?text=Shirtify'" />
+        ${p.is_featured ? '<span class="featured-tag">Featured</span>' : ''}
+        ${d > 0 ? `<span class="discount-tag">${d}% OFF</span>` : ''}
+      </div>
+      <div class="body">
+        <span class="cat">${p.category}</span>
+        <h3>${p.name}</h3>
+        <p class="desc">${p.description || ''}</p>
+        <div class="meta">
+          <span>Size: ${p.size}</span>
+          <span>${p.color}</span>
+          <span>${p.fabric}</span>
+        </div>
+        <div class="price-row">
+          <span class="price">₹${p.price.toLocaleString('en-IN')}</span>
+          ${p.original_price ? `<span class="mrp">₹${p.original_price.toLocaleString('en-IN')}</span>` : ''}
+        </div>
+        <a class="btn" href="https://github.com/AshitoshKamble/Nuvama_Wealth" target="_blank" rel="noopener">View on GitHub</a>
+      </div>
+    </article>`;
+  }).join('');
+}
+
+function renderFilters() {
+  const cats = ['all', ...new Set(products.map(p => p.category))];
+  filters.innerHTML = cats.map(c => {
+    const label = c === 'all' ? 'All' : c.charAt(0).toUpperCase() + c.slice(1);
+    return `<button class="chip ${c === active ? 'active' : ''}" data-cat="${c}">${label}</button>`;
+  }).join('');
+  filters.querySelectorAll('.chip').forEach(btn => {
+    btn.addEventListener('click', () => { active = btn.dataset.cat; renderFilters(); render(); });
+  });
+}
+
+renderFilters();
+render();
+</script>
+</body>
+</html>
